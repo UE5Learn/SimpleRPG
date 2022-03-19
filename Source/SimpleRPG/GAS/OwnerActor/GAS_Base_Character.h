@@ -27,6 +27,47 @@ public:
 	/* AbilitySystemComponent */
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<URPG_ASC> RPG_AbilitySystemComponent;
+	
+	/* 尝试获取Attribute CurrentValue，如果未拥有该Attribute，返回值为0 */
+	UFUNCTION(BlueprintPure,Category = "GAS|Attributes")
+	float GetAttributeValue(FGameplayAttribute Attribute, bool& bSuccessfullyFoundAttribute) const;
+
+	/* 尝试获取Attribute BaseValue，如果未拥有该Attribute，返回值为0 */
+	UFUNCTION(BlueprintPure,Category = "GAS|Attributes")
+	float GetAttributeBaseValue(FGameplayAttribute Attribute, bool& bSuccessfullyFoundAttribute) const;
+	
+	void OnAttributeValueChange(const FOnAttributeChangeData& Data);
+	/* 如果监听了AttributeChange事件,所有AttributeValue被改变时都会调用该事件通知蓝图，传入被改变的AttributeName和NewValue,OldValue */
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS|K2Node")
+	void K2_OnAttributeValueChange(const FString& Name,float NewValue,float OldValue);
+
+	/* 被添加到ListenNewOrRemoveTags数组中的tag被生成或被完全删除时调用该事件 */
+	UFUNCTION(BlueprintImplementableEvent,Category = "GAS|K2Node")
+	void K2_OnTagNewOrRemove(const FGameplayTag GameplayTag,int32 Count);
+
+	/* 被添加到ListenAnyCountChangeTags数组的tagCount被改变时调用该事件 */
+	UFUNCTION(BlueprintImplementableEvent,Category = "GAS|K2Node")
+	void K2_OnTagCountChange(const FGameplayTag GameplayTag,int32 Count);
+	
+	
+
+	
+
+
+
+protected:
+
+	/* 是否需要注册监听所有AttributeValueChange事件 */
+	UPROPERTY(EditAnywhere,Category = "GAS_Base_Character|DefaultValue")
+	bool ShouldRegisterAllAttributeChangeEvent;
+
+	/* 该数组的tags的第一次添加和被完全删除事件被监听 */
+	UPROPERTY(EditAnywhere,Category = "GAS_Base_Character|Tags")
+	TArray<FGameplayTag> ListenNewOrRemoveTags;
+
+	/* 该数组的tags任何TagCount被改变事件被监听 */
+	UPROPERTY(EditAnywhere,Category = "GAS_Base_Character|Tags")
+	TArray<FGameplayTag> ListenAnyCountChangeTags;
 
 	/* AttributeSet数组,在BeginPlay初始化 */
 	UPROPERTY(EditAnywhere,Category = "GAS_Base_Character|Abilitys")
@@ -41,38 +82,6 @@ public:
 	TSubclassOf<UGameplayEffect> InitializeEffect;
 
 	
-	void OnAttributeValueChange(const FOnAttributeChangeData& Data);
-	/* 如果监听了AttributeChange事件,所有AttributeValue被改变时都会调用该事件通知蓝图，传入被改变的AttributeName和NewValue,OldValue */
-	UFUNCTION(BlueprintImplementableEvent, Category = "GAS|K2Node")
-	void K2_OnAttributeValueChange(const FString& Name,float NewValue,float OldValue);
-	
-
-	
-
-	
-
-
-
-protected:
-
-	/* 是否需要注册监听所有AttributeValueChange事件 */
-	UPROPERTY(EditAnywhere,Category = "GAS_Base_Character|DefaultValue")
-	bool ShouldRegisterAllAttributeChangeEvent;
-
-	
-
-	/* 尝试获取Attribute CurrentValue，如果未拥有该Attribute，返回值为0 */
-	UFUNCTION(BlueprintPure,Category = "GAS|Attributes")
-	float GetAttributeValue(FGameplayAttribute Attribute, bool& bSuccessfullyFoundAttribute) const;
-
-	/* 尝试获取Attribute BaseValue，如果未拥有该Attribute，返回值为0 */
-	UFUNCTION(BlueprintPure,Category = "GAS|Attributes")
-	float GetAttributeBaseValue(FGameplayAttribute Attribute, bool& bSuccessfullyFoundAttribute) const;
-
-	
-
-	
-
 	
 
 };

@@ -17,7 +17,4 @@ class SIMPLERPG_API URPG_ASC : public UAbilitySystemComponent
 public:
 	URPG_ASC();
 	
-
-	
-	
 };

@@ -60,6 +60,18 @@ void AGAS_Base_Character::BeginPlay()
 					RPG_AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this,&AGAS_Base_Character::OnAttributeValueChange);
 			}
 		}
+
+		for(const auto& Tag : ListenNewOrRemoveTags)
+		{
+			if(Tag.IsValid())
+				RPG_AbilitySystemComponent->RegisterGameplayTagEvent(Tag,EGameplayTagEventType::NewOrRemoved).AddUObject(this,&AGAS_Base_Character::K2_OnTagNewOrRemove);
+		}
+
+		for(const auto& Tag : ListenAnyCountChangeTags)
+		{
+			if(Tag.IsValid())
+				RPG_AbilitySystemComponent->RegisterGameplayTagEvent(Tag,EGameplayTagEventType::AnyCountChange).AddUObject(this,&AGAS_Base_Character::K2_OnTagCountChange);
+		}
 		
 		
 	}
