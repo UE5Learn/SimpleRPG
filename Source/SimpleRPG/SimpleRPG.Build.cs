@@ -11,7 +11,8 @@ public class SimpleRPG : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore",
-			"GameplayAbilities","GameplayTags","GameplayTasks"
+			"GameplayAbilities","GameplayTags","GameplayTasks",
+			"EnhancedInput"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
