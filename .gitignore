@@ -14,3 +14,5 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+Source/SimpleRPG/CameraSystem/RPG_PlayerCameraManager.cpp
+Source/SimpleRPG/CameraSystem/RPG_PlayerCameraManager.h
