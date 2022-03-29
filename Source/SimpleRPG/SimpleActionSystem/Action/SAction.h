@@ -54,6 +54,8 @@ public:
 	UFUNCTION(BlueprintPure,Category = "Action")
 	USActionComponent* GetOwnerActionComponent() const;
 
+	
+
 	/* 获取当前Action是否在运行 */
 	UFUNCTION(BlueprintPure,Category = "Action")
 	bool IsRunning() const;
@@ -100,6 +102,10 @@ protected:
 	/* 目标没有这些tag才可以激活 */
 	UPROPERTY(EditDefaultsOnly,Category = "Tags")
 	FGameplayTagContainer BlockedTags;
+
+	/* 该标签被添加时自动激活 */
+	UPROPERTY(EditDefaultsOnly,Category = "Tags")
+	FGameplayTag TriggerTag;
 
 	float TimeStarted;
 	

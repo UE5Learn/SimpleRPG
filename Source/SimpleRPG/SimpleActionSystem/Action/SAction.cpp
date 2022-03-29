@@ -10,6 +10,10 @@ void USAction::Initialize(TObjectPtr<USActionComponent> InstigatorActionComp,TOb
 	{
 		ActionSpec.Instigator = InstigatorActionComp;
 		ActionSpec.Owner = OwnerActionComp;
+		if(TriggerTag.IsValid())
+		{
+			ActionSpec.Owner->GetActionTriggerTags().FindOrAdd(TriggerTag).Actions.Add(this);
+		}
 		if(bAutoActive)
 		{
 			ActiveAction();
@@ -70,7 +74,7 @@ void USAction::ActiveAction()
 	UE_LOG(LogTemp,Log,TEXT("ActionStarted: %s"),*GetNameSafe(this));
 
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
-	OwnerActionComponent->GetActiveTagContainer().AppendTags(ApplyToOwnerTags);
+	OwnerActionComponent->AppendTags(ApplyToOwnerTags);
 	ActionSpec.bIsRunning = true;
 	OwnerActionComponent->OnActionActive.Broadcast(OwnerActionComponent,this);
 	OnActiveAction();
@@ -81,7 +85,8 @@ void USAction::EndAction()
 	UE_LOG(LogTemp,Log,TEXT("ActionEnd: %s"),*GetNameSafe(this));
 
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
-	OwnerActionComponent->GetActiveTagContainer().RemoveTags(ApplyToOwnerTags);
+	OwnerActionComponent->RemoveTags(ApplyToOwnerTags);
 	ActionSpec.bIsRunning = false;
 	OwnerActionComponent->OnActionEnd.Broadcast(OwnerActionComponent,this);
+	OnEndAction();
 }
