@@ -39,6 +39,28 @@ struct FActionSpec
 	
 };
 
+UENUM(BlueprintType)
+enum class ECooldownType : uint8
+{
+	Default			UMETA(DisplayName="默认"),
+	Time			UMETA(DisplayName="时间")
+};
+
+USTRUCT(BlueprintType)
+struct FCooldownSpec
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	ECooldownType CooldownType;
+
+	UPROPERTY(EditDefaultsOnly,meta = (EditCondition = "CooldownType == ECooldownType::Time",EditConditionHides))
+	float CooldownTime;
+
+	float Rate = 0.1;
+	
+};
+
 
 
 UCLASS(Blueprintable)
@@ -59,7 +81,15 @@ public:
 	/* 获取当前Action是否在运行 */
 	UFUNCTION(BlueprintPure,Category = "Action")
 	bool IsRunning() const;
-	
+
+	/* 激活运行状态 */
+	void ActiveRunning();
+	/* 结束运行状态 */
+	void EndRunning();
+	/* 检查冷却时间 */
+	void CheckActionCooldown();
+
+	/* 检查是否可以激活技能 */
 	bool CanActive();
 	
 	/* 额外判定是否可以激活 */
@@ -107,6 +137,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category = "Tags")
 	FGameplayTag TriggerTag;
 
-	float TimeStarted;
+	/* 冷却时间设置 */
+	UPROPERTY(EditDefaultsOnly,Category = "Cooldown")
+	FCooldownSpec CooldownSpec;
+
+	FTimerHandle CooldownHandle;
+
+	float CurrentCooldownTime;
 	
 };

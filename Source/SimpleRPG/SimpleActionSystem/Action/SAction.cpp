@@ -33,6 +33,39 @@ bool USAction::IsRunning() const
 	return ActionSpec.bIsRunning;
 }
 
+void USAction::ActiveRunning()
+{
+	if(CooldownSpec.CooldownType == ECooldownType::Default)
+	{
+		ActionSpec.bIsRunning = true;
+		return;
+	}
+	if(CooldownSpec.CooldownTime > 0.0f)
+	{
+		CurrentCooldownTime = CooldownSpec.CooldownTime;
+		ActionSpec.bIsRunning = true;
+		GetWorld()->GetTimerManager().SetTimer(CooldownHandle,this,&USAction::CheckActionCooldown,CooldownSpec.Rate,true,0);
+	}
+}
+
+void USAction::EndRunning()
+{
+	if(CooldownSpec.CooldownType == ECooldownType::Default)
+	{
+		ActionSpec.bIsRunning = false;
+	}
+}
+
+void USAction::CheckActionCooldown()
+{
+	CurrentCooldownTime  = CurrentCooldownTime - CooldownSpec.Rate;
+	if(CurrentCooldownTime <= 0.0f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CooldownHandle);
+		ActionSpec.bIsRunning = false;
+	}
+}
+
 UWorld* USAction::GetWorld() const
 {
 	TObjectPtr<AActor> Actor = Cast<AActor>(GetOuter());
@@ -46,10 +79,10 @@ UWorld* USAction::GetWorld() const
 
 bool USAction::CanActive()
 {
-	if(!OnCanActive() || IsRunning())
-	{
+	if(!OnCanActive())
 		return false;
-	}
+	if(IsRunning())
+		return false;
 	
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
 	if(!OwnerActionComponent || OwnerActionComponent->GetActiveTagContainer().HasAny(BlockedTags))
@@ -71,22 +104,19 @@ void USAction::ActiveAction()
 	{
 		return;
 	}
-	UE_LOG(LogTemp,Log,TEXT("ActionStarted: %s"),*GetNameSafe(this));
 
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
 	OwnerActionComponent->AppendTags(ApplyToOwnerTags);
-	ActionSpec.bIsRunning = true;
+	ActiveRunning();
 	OwnerActionComponent->OnActionActive.Broadcast(OwnerActionComponent,this);
 	OnActiveAction();
 }
 
 void USAction::EndAction()
 {
-	UE_LOG(LogTemp,Log,TEXT("ActionEnd: %s"),*GetNameSafe(this));
-
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
 	OwnerActionComponent->RemoveTags(ApplyToOwnerTags);
-	ActionSpec.bIsRunning = false;
+	EndRunning();
 	OwnerActionComponent->OnActionEnd.Broadcast(OwnerActionComponent,this);
 	OnEndAction();
 }
