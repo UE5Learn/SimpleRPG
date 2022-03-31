@@ -35,26 +35,14 @@ bool USAction::IsRunning() const
 
 void USAction::ActiveRunning()
 {
-	if(CooldownSpec.CooldownType == ECooldownType::Default)
-	{
-		ActionSpec.bIsRunning = true;
-		return;
-	}
-	if(CooldownSpec.CooldownTime > 0.0f)
+	ActionSpec.bIsRunning = true;
+	if(CooldownSpec.CooldownType == ECooldownType::Time && CooldownSpec.CooldownTime > 0.0f)
 	{
 		CurrentCooldownTime = CooldownSpec.CooldownTime;
-		ActionSpec.bIsRunning = true;
 		GetWorld()->GetTimerManager().SetTimer(CooldownHandle,this,&USAction::CheckActionCooldown,CooldownSpec.Rate,true,0);
 	}
 }
 
-void USAction::EndRunning()
-{
-	if(CooldownSpec.CooldownType == ECooldownType::Default)
-	{
-		ActionSpec.bIsRunning = false;
-	}
-}
 
 void USAction::CheckActionCooldown()
 {
@@ -62,7 +50,6 @@ void USAction::CheckActionCooldown()
 	if(CurrentCooldownTime <= 0.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(CooldownHandle);
-		ActionSpec.bIsRunning = false;
 	}
 }
 
@@ -79,9 +66,7 @@ UWorld* USAction::GetWorld() const
 
 bool USAction::CanActive()
 {
-	if(!OnCanActive())
-		return false;
-	if(IsRunning())
+	if(!OnCanActive() || IsRunning() || CurrentCooldownTime > 0)
 		return false;
 	
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
@@ -116,7 +101,7 @@ void USAction::EndAction()
 {
 	TObjectPtr<USActionComponent> OwnerActionComponent = GetOwnerActionComponent();
 	OwnerActionComponent->RemoveTags(ApplyToOwnerTags);
-	EndRunning();
+	ActionSpec.bIsRunning = false;
 	OwnerActionComponent->OnActionEnd.Broadcast(OwnerActionComponent,this);
 	OnEndAction();
 }

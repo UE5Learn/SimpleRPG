@@ -84,8 +84,6 @@ public:
 
 	/* 激活运行状态 */
 	void ActiveRunning();
-	/* 结束运行状态 */
-	void EndRunning();
 	/* 检查冷却时间 */
 	void CheckActionCooldown();
 
